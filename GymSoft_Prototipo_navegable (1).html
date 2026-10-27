@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>GymSoft – Prototipo navegable</title>
+<style>
+:root{color-scheme:dark;--bg:#0a0a0a;--sf:#161616;--ink:#f5f5f5;--mu:#a3a3a3;--ln:#2e2e2e;--ac:#ffc400;--ac2:#241d00;--ok:#5fd68a;--okb:#0f2a18;--er:#ff6b63;--erb:#33100e;--wa:#ffd23f;--wab:#2e2500;--sb:#000;--sbt:#d4d4d4;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 "Segoe UI",system-ui,-apple-system,Roboto,sans-serif}
+h1,h2,h3{margin:0;letter-spacing:-.01em}h1{font-size:26px}h2{font-size:18px}h3{font-size:15px}
+a{color:var(--ac)}button{font:inherit;cursor:pointer}
+.shell{display:flex;min-height:100%}
+nav.sb{border-right:1px solid var(--ln);width:236px;background:var(--sb);color:var(--sbt);padding:18px 12px;flex-shrink:0;display:flex;flex-direction:column;gap:2px}
+.logo{font-weight:800;font-size:20px;color:#fff;padding:4px 10px 16px}.logo i{color:var(--ac);font-style:normal}
+nav.sb button,.drawer button{background:none;border:0;color:inherit;text-align:left;padding:9px 10px;border-radius:6px;width:100%}
+nav.sb button:hover,.drawer button:hover{background:#ffffff14}nav.sb button.on,.drawer button.on{background:var(--ac);color:#000;font-weight:600}
+nav.sb .grp,.drawer .grp{font-size:12px;padding:12px 10px 4px;color:#8a8a8a}
+main{flex:1;padding:24px;min-width:0;max-width:1100px}
+.bar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.crumb{color:var(--mu);font-size:13px;margin-bottom:4px}
+.card{background:var(--sf);border:1px solid var(--ln);border-radius:10px;padding:18px}
+.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(190px,1fr))}
+.kpi{background:var(--sf);border:1px solid var(--ln);border-left:4px solid var(--ac);border-radius:10px;padding:14px;cursor:pointer;text-align:left;color:var(--ink)}
+.kpi b{display:block;font-size:30px;line-height:1.1}.kpi span{color:var(--mu);font-size:13px}.kpi.w{border-left-color:var(--er)}
+.btn{background:var(--ac);color:#000;border:0;border-radius:7px;padding:9px 16px;font-weight:600}.btn:hover{filter:brightness(1.1)}
+.btn.s{background:var(--sf);color:var(--ink);border:1px solid var(--ln)}.btn.d{background:var(--er);color:#000}.btn.sm{padding:5px 10px;font-size:13px}
+:focus-visible{outline:3px solid var(--ac);outline-offset:2px}
+.tw{overflow-x:auto}table{width:100%;border-collapse:collapse;background:var(--sf)}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--ln);white-space:nowrap}th{font-size:13px;color:var(--mu);font-weight:600}
+tr.cl{cursor:pointer}tr.cl:hover{background:var(--ac2)}
+.tag{display:inline-block;padding:2px 9px;border-radius:99px;font-size:12px;font-weight:600}
+.t-ok{background:var(--okb);color:var(--ok)}.t-er{background:var(--erb);color:var(--er)}.t-wa{background:var(--wab);color:var(--wa)}.t-mu{background:var(--ac2);color:var(--mu)}
+.form{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+.f label{display:block;font-weight:600;font-size:13px;margin-bottom:4px}
+.f input,.f select,.f textarea{width:100%;padding:9px 10px;border:1px solid var(--ln);border-radius:7px;background:var(--sf);color:var(--ink);font:inherit}
+.f.bad input,.f.bad select,.f.bad textarea{border-color:var(--er);background:var(--erb)}.f small.e{display:none;color:var(--er);font-size:12.5px;margin-top:3px}.f.bad small.e{display:block}
+.f.w2{grid-column:1/-1}.hint{font-size:12.5px;color:var(--mu)}
+.ban{background:var(--erb);color:var(--er);border:1px solid var(--er);border-radius:8px;padding:10px 14px;margin-bottom:14px}
+.empty{text-align:center;padding:34px;color:var(--mu)}
+.srch{display:flex;gap:8px;margin-bottom:12px}.srch input{font:inherit;flex:1;padding:9px 10px;border:1px solid var(--ln);border-radius:7px;background:var(--sf);color:var(--ink)}
+#toast{position:fixed;right:16px;top:calc(16px + env(safe-area-inset-top,0px));z-index:50;display:grid;gap:8px}
+.tt{background:var(--okb);color:var(--ok);border:1px solid var(--ok);padding:11px 16px;border-radius:8px;font-weight:600;box-shadow:0 6px 18px #0003;animation:in .25s}
+@keyframes in{from{transform:translateX(20px);opacity:0}}@media(prefers-reduced-motion:reduce){.tt{animation:none}}
+.mod{position:fixed;inset:0;background:#0009;display:grid;place-items:center;z-index:60;padding:16px}.mod .card{max-width:400px;width:100%}
+.dl{display:grid;grid-template-columns:150px 1fr;gap:8px 12px}.dl dt{color:var(--mu)}.dl dd{margin:0}
+.land{min-height:100vh;display:grid;place-items:center;padding:24px;background:var(--sb);color:#fff;text-align:center}
+.land h1{font-size:clamp(36px,8vw,64px);margin-bottom:8px}.land h1 i{color:var(--ac);font-style:normal}.land p{color:var(--sbt);max-width:480px;margin:0 auto 22px}
+.lg{max-width:380px;width:100%;margin:auto;text-align:left;color:var(--ink)}
+ul.tree{list-style:none;padding-left:18px;border-left:2px solid var(--ln);margin:6px 0}ul.tree li{margin:4px 0}ul.tree.r{border:0;padding:0}
+.two{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.two{grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr))}
+.mtop,.bnav,.scrim,.drawer{display:none}
+.ib{background:none;border:0;color:var(--ink);padding:6px;border-radius:10px;display:grid;place-items:center}
+.ic{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+@media(max-width:760px){
+ nav.sb{display:none}.shell{flex-direction:column}
+ main{padding:16px 14px calc(92px + env(safe-area-inset-bottom,0px))}
+ h1{font-size:23px}.grid{grid-template-columns:repeat(2,1fr);gap:10px}.kpi b{font-size:26px}
+ .dl{grid-template-columns:105px 1fr}.bar .btn{padding:10px 14px}
+ #toast{left:12px;right:12px;top:calc(68px + env(safe-area-inset-top,0px))}
+ /* barra superior */
+ .mtop{display:flex;align-items:center;gap:8px;position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:var(--sb);border-bottom:1px solid var(--ln);padding:8px 12px}
+ .mtop b{flex:1;font-size:18px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+ .mtop .logo{padding:0;font-size:18px}
+ /* barra inferior tipo app */
+ .bnav{display:grid;grid-template-columns:repeat(5,1fr);position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--sb);border-top:1px solid var(--ln);padding:6px 4px calc(6px + env(safe-area-inset-bottom,0px))}
+ .bnav button{background:none;border:0;color:var(--mu);display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11.5px;padding:6px 2px;border-radius:10px}
+ .bnav button.on{color:var(--ac);font-weight:700}.bnav button.on .ic{stroke-width:2.2}
+ /* menú lateral deslizable */
+ .scrim{display:block;position:fixed;inset:0;background:#000b;z-index:40;opacity:0;pointer-events:none;transition:opacity .2s}
+ .drawer{display:flex;flex-direction:column;gap:2px;position:fixed;top:0;bottom:0;left:0;width:min(300px,84vw);background:var(--sb);border-right:1px solid var(--ln);z-index:50;transform:translateX(-102%);transition:transform .22s;overflow-y:auto;padding:calc(14px + env(safe-area-inset-top,0px)) 12px calc(14px + env(safe-area-inset-bottom,0px))}
+ .drawer button{padding:12px;font-size:16px}
+ body.mopen{overflow:hidden}body.mopen .scrim{opacity:1;pointer-events:auto}body.mopen .drawer{transform:none}
+ @media(prefers-reduced-motion:reduce){.scrim,.drawer{transition:none}}
+ /* tablas -> tarjetas */
+ .tw.card{background:none;border:0;padding:0;overflow:visible}
+ table,tbody{display:block;background:none}thead{display:none}
+ tr{display:block;background:var(--sf);border:1px solid var(--ln);border-radius:14px;padding:4px 14px;margin-bottom:12px}
+ td{display:flex;justify-content:space-between;align-items:center;gap:14px;text-align:right;white-space:normal;padding:9px 0;border-bottom:1px solid var(--ln)}
+ td:last-child{border-bottom:0}
+ td::before{content:attr(data-label);color:var(--mu);font-size:13px;font-weight:600;text-align:left;flex-shrink:0}
+ td[data-label=""]::before{display:none}td[data-label=""] .btn{width:100%;padding:10px}
+ tr.cl:active{background:var(--ac2)}
+}
+</style></head><body>
+<div id="toast"></div><div id="app"></div>
+<script>
+const $=s=>document.querySelector(s),app=$("#app");
+const dd=n=>{const x=new Date();x.setDate(x.getDate()+n);return x.toISOString().slice(0,10)};
+const TODAY=dd(0);
+const S={
+ socios:[{id:1,nombre:"Laura Gómez",doc:"1075321456",tel:"3105558821",edad:28,ent:1,rut:1,estado:"Pagado"},{id:2,nombre:"Carlos Ruiz",doc:"1075998877",tel:"3123334455",edad:45,ent:2,rut:2,estado:"Pendiente"},{id:3,nombre:"Marta Pérez",doc:"36501234",tel:"3009871122",edad:63,ent:null,rut:null,estado:"Pendiente"},{id:4,nombre:"Andrés Vela",doc:"1004556677",tel:"3187776655",edad:17,ent:1,rut:3,estado:"Pagado"}],
+ ents:[{id:1,nombre:"Julián Torres",esp:"Fuerza e hipertrofia",tel:"3151112233"},{id:2,nombre:"Diana Soto",esp:"Funcional y cardio",tel:"3162223344"},{id:3,nombre:"Mauricio Díaz",esp:"Rehabilitación",tel:"3173334455"}],
+ ruts:[{id:1,nombre:"Full body inicial",desc:"Circuito de cuerpo completo, 3 días por semana.",dur:8,niv:"Básico"},{id:2,nombre:"Cardio y resistencia",desc:"Intervalos y trabajo aeróbico.",dur:12,niv:"Intermedio"},{id:3,nombre:"Hipertrofia split",desc:"División por grupos musculares, 5 días.",dur:16,niv:"Avanzado"}],
+ pagos:[{id:101,soc:1,val:90000,fec:dd(-20),est:"Pagado"},{id:102,soc:2,val:90000,fec:dd(-12),est:"Pendiente"},{id:103,soc:2,val:90000,fec:dd(-3),est:"Pendiente"},{id:104,soc:3,val:60000,fec:dd(5),est:"Pendiente"},{id:105,soc:4,val:90000,fec:dd(-1),est:"Pagado"}],
+ mems:[{id:201,soc:1,tipo:"Mensual",ini:dd(-20),ven:dd(10),est:"Activa"},{id:202,soc:2,tipo:"Trimestral",ini:dd(-120),ven:dd(-30),est:"Vencida"},{id:203,soc:3,tipo:"Mensual",ini:dd(-5),ven:dd(25),est:"Activa"},{id:204,soc:4,tipo:"Anual",ini:dd(-1),ven:dd(364),est:"Activa"}]};
+let V="inicio",P=null,logged=false;
+const go=(v,p=null)=>{V=v;P=p;render();scrollTo(0,0)};
+const g=id=>$("#"+id)?$("#"+id).value.trim():"";
+const money=n=>"$"+Number(n).toLocaleString("es-CO");
+const find=(k,id)=>S[k].find(x=>x.id===+id);
+const nombreSoc=id=>{const s=find("socios",id);return s?s.nombre:"—"};
+const moroso=id=>S.pagos.some(p=>p.soc===id&&p.est==="Pendiente"&&p.fec<TODAY);
+const nextId=(k,b)=>S[k].reduce((m,x)=>Math.max(m,x.id),b)+1;
+function toast(t){const e=document.createElement("div");e.className="tt";e.textContent=t;$("#toast").appendChild(e);setTimeout(()=>e.remove(),3200)}
+function confirmBox(msg,ok){const m=document.createElement("div");m.className="mod";m.innerHTML=`<div class="card" role="dialog" aria-modal="true"><h2>Confirmar acción</h2><p>${msg}</p><div class="bar" style="margin:0"><button class="btn s" id="mc">Cancelar</button><button class="btn d" id="mo">Sí, eliminar</button></div></div>`;document.body.appendChild(m);$("#mc").onclick=()=>m.remove();$("#mo").onclick=()=>{m.remove();ok()}}
+function F(id,l,o={}){const t=o.t||"text";let c;
+ if(t==="select")c=`<select id="${id}">${o.opts.map(x=>`<option${x===o.v?" selected":""}>${x}</option>`).join("")}</select>`;
+ else if(t==="area")c=`<textarea id="${id}" rows="3">${o.v||""}</textarea>`;
+ else c=`<input id="${id}" type="${t}" value="${o.v??""}"${o.ro?" readonly":""}${o.ph?` placeholder="${o.ph}"`:""}${o.list?` list="${o.list}"`:""}>`;
+ return `<div class="f${o.w?" w2":""}" id="f_${id}"><label for="${id}">${l}</label>${c}<small class="e" id="e_${id}"></small>${o.h?`<span class="hint">${o.h}</span>`:""}</div>`}
+function check(errs){document.querySelectorAll(".f.bad").forEach(e=>e.classList.remove("bad"));const b=$("#ban");b&&b.remove();
+ const k=Object.keys(errs);if(!k.length)return true;
+ k.forEach(i=>{const f=$("#f_"+i);if(f){f.classList.add("bad");$("#e_"+i).textContent=errs[i]}});
+ const d=document.createElement("div");d.id="ban";d.className="ban";d.setAttribute("role","alert");d.textContent="No se guardó: "+errs[k[0]];$("#form").prepend(d);$("#f_"+k[0]).scrollIntoView({block:"center"});return false}
+const tag=(t)=>`<span class="tag ${{Pagado:"t-ok",Activa:"t-ok",Pendiente:"t-wa",Vencida:"t-er",Cancelada:"t-mu",Moroso:"t-er"}[t]||"t-mu"}">${t}</span>`;
+function tbl(h,rows,empty,click){if(!rows.length)return `<div class="card empty">${empty}</div>`;
+ return `<div class="tw card" style="padding:0"><table><thead><tr>${h.map(x=>`<th>${x}</th>`).join("")}</tr></thead><tbody>${rows.map(r=>`<tr${click?` class="cl" tabindex="0" onclick="${click(r)}"`:""}>${r.c.map((x,i)=>`<td data-label="${h[i]||""}">${x}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`}
+function head(c,t,btn){return `<div class="crumb">${c}</div><div class="bar"><h1>${t}</h1>${btn||""}</div>`}
+const NAV=[["dash","Dashboard"],["g1","Personas"],["socios","Socios"],["ents","Entrenadores"],["g2","Entrenamiento"],["ruts","Rutinas"],["asig","Asignaciones"],["g3","Finanzas"],["pagos","Pagos"],["mems","Membresías"],["g4","Reportes"],["activas","Membresías activas"],["morosos","Socios morosos"],["g5","Ayuda"],["mapa","Mapa de navegación"]];
+const grp={socios:["socio-f","socio-d"],ents:["ent-f"],ruts:["rut-f"],pagos:["pago-f"],mems:["mem-f"]};
+const IC={dash:'<path d="M3 11l9-8 9 8v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/>',socios:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.6a3.5 3.5 0 0 1 0 6.8M18 14a6 6 0 0 1 3.5 6"/>',pagos:'<rect x="2.5" y="5" width="19" height="14" rx="2"/><path d="M2.5 10h19"/>',mems:'<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="11" r="2.2"/><path d="M5.5 17a3.8 3.8 0 0 1 7 0M15 9h3M15 13h3"/>',menu:'<path d="M4 7h16M4 12h16M4 17h16"/>'};
+const ico=k=>`<svg class="ic" viewBox="0 0 24 24" aria-hidden="true">${IC[k]}</svg>`;
+window.toggleMenu=()=>document.body.classList.toggle("mopen");
+function shell(body){const act=v=>V===v||(grp[v]||[]).includes(V),isG=k=>k[0]==="g"&&k.length===2;
+ const items=NAV.map(([k,l])=>isG(k)?`<div class="grp">${l}</div>`:`<button class="${act(k)?"on":""}" onclick="go('${k}')">${l}</button>`).join("");
+ const out=`<button onclick="logged=false;go('inicio')" style="margin-top:auto">Cerrar sesión</button>`;
+ const cur=(NAV.find(([k])=>!isG(k)&&act(k))||[0,"GymSoft"])[1];
+ const bn=[["dash","Inicio"],["socios","Socios"],["pagos","Pagos"],["mems","Membresías"]].map(([k,l])=>`<button class="${act(k)?"on":""}" onclick="go('${k}')">${ico(k)}<span>${l}</span></button>`).join("");
+ return `<div class="shell"><header class="mtop"><button class="ib" onclick="toggleMenu()" aria-label="Abrir menú">${ico("menu")}</button><b>${cur}</b><div class="logo">Gym<i>Soft</i></div></header><nav class="sb" aria-label="Principal"><div class="logo">Gym<i>Soft</i></div>${items}${out}</nav><main>${body}</main><div class="scrim" onclick="toggleMenu()"></div><nav class="drawer" aria-label="Menú"><div class="logo">Gym<i>Soft</i></div>${items}${out}</nav><nav class="bnav" aria-label="Navegación móvil">${bn}<button onclick="toggleMenu()">${ico("menu")}<span>Menú</span></button></nav></div>`}
+function render(){document.body.classList.remove("mopen");
+ if(!logged&&V!=="inicio"&&V!=="login")V="login";
+ const fn=VIEWS[V];const h=fn();app.innerHTML=["inicio","login"].includes(V)?h:shell(h)}
+function socTable(){const q=(window.Q||"").toLowerCase().trim();
+ if(!S.socios.length)return `<div class="card empty">No existen socios registrados</div>`;
+ const r=S.socios.filter(x=>!q||(x.id+" "+x.nombre+" "+x.doc).toLowerCase().includes(q));
+ return tbl(["ID","Nombre","Documento","Teléfono","Edad","Entrenador","Rutina","Estado"],r.map(x=>({id:x.id,c:[x.id,x.nombre,x.doc,x.tel,x.edad,x.ent?find("ents",x.ent).nombre:"Sin asignar",x.rut?find("ruts",x.rut).nombre:"Sin asignar",tag(x.estado)+(moroso(x.id)?" "+tag("Moroso"):"")]})),"Ningún socio coincide con la búsqueda.",z=>`go('socio-d',${z.id})`)}
+const setEstadoSocio=(x,es)=>{if(x.estado===es)return;x.estado=es;const ps=S.pagos.filter(p=>p.soc===x.id);if(!ps.length)return;
+ if(es==="Pagado")ps.forEach(p=>p.est="Pagado");else ps.sort((a,b)=>a.fec<b.fec?1:-1)[0].est="Pendiente"};
+const syncSocio=id=>{const x=find("socios",id);if(!x)return;const ps=S.pagos.filter(p=>p.soc===id);if(ps.length)x.estado=ps.some(p=>p.est==="Pendiente")?"Pendiente":"Pagado"};
+const VIEWS={
+inicio:()=>`<div class="land"><div><h1>Gym<i>Soft</i></h1><p>Gestión de socios, entrenadores, rutinas, pagos y membresías de tu gimnasio, en un solo lugar.</p><button class="btn" onclick="go('login')">Ingresar al sistema</button><p style="margin-top:22px;font-size:13px">Chrome · Firefox · Edge · Safari</p></div></div>`,
+login:()=>`<div class="land"><div class="card lg"><h1 style="font-size:24px">Iniciar sesión</h1><p style="color:var(--mu);margin:4px 0 14px">Acceso exclusivo para el Administrador (RNF-03).</p><div id="form" class="form" style="grid-template-columns:1fr">${F("usr","Usuario",{ph:"admin"})}${F("pwd","Contraseña",{t:"password",ph:"admin123"})}<button class="btn" onclick="doLogin()">Ingresar</button></div><p class="hint" style="margin-top:12px">Demo: admin / admin123. No hay registro de cuentas: el Administrador ya cuenta con credenciales válidas (sección 2.4). <a href="#" onclick="go('inicio');return false">Volver al inicio</a></p></div></div>`,
+dash:()=>{const m=S.socios.filter(s=>moroso(s.id)).length,a=S.mems.filter(x=>x.est==="Activa").length,p=S.pagos.filter(x=>x.est==="Pendiente").length;
+ return head("Inicio","Dashboard")+`<div class="grid"><button class="kpi" onclick="go('socios')"><b>${S.socios.length}</b><span>Socios registrados</span></button><button class="kpi" onclick="go('activas')"><b>${a}</b><span>Membresías activas</span></button><button class="kpi w" onclick="go('morosos')"><b>${m}</b><span>Socios morosos</span></button><button class="kpi" onclick="go('pagos')"><b>${p}</b><span>Pagos pendientes</span></button><button class="kpi" onclick="go('ents')"><b>${S.ents.length}</b><span>Entrenadores</span></button><button class="kpi" onclick="go('ruts')"><b>${S.ruts.length}</b><span>Rutinas en catálogo</span></button></div>
+ <h2 style="margin:22px 0 10px">Acciones rápidas</h2><div class="bar" style="justify-content:flex-start"><button class="btn" onclick="go('socio-f')">Registrar socio</button><button class="btn s" onclick="go('pago-f')">Registrar pago</button><button class="btn s" onclick="go('mem-f')">Registrar membresía</button><button class="btn s" onclick="go('asig')">Asignar entrenador o rutina</button><button class="btn s" onclick="go('morosos')">Generar reporte de morosos</button></div>`},
+socios:()=>head("Socios · RF-04","Consulta de socios",`<button class="btn" onclick="go('socio-f')">Registrar socio</button>`)+`<div class="srch"><input id="q" placeholder="Buscar por ID, nombre o documento" value="${window.Q||""}" oninput="window.Q=this.value;$('#res').innerHTML=socTable()" autocomplete="off"></div><div id="res">${socTable()}</div>`,
+"socio-f":()=>{const s=P?find("socios",P):null;
+ return head("Socios · "+(s?"RF-02":"RF-01"),s?"Actualizar socio":"Registrar socio")+`<div class="card" id="form"><div class="form">${F("sid","ID del socio",{t:"number",v:s?s.id:nextId("socios",0),ro:!!s,h:s?"El ID no se puede modificar.":"Debe ser único. Se usa en Asignaciones, Pagos y Membresías."})}${F("nombre","Nombre completo",{v:s?.nombre})}${F("doc","Documento de identidad",{v:s?.doc,ro:!!s,h:s?"El documento no se puede modificar (RN-02).":"Debe ser único (RN-02)."})}${F("tel","Teléfono celular",{v:s?.tel,h:"10 dígitos numéricos (RN-03)."})}${F("edad","Edad",{t:"number",v:s?.edad,h:"Entre 14 y 80 años (RN-01)."})}${F("estado","Estado",{t:"select",opts:["Pagado","Pendiente"],v:s?s.estado:"Pendiente",h:"Indica si el socio pagó o tiene el pago pendiente."})}</div><div class="bar" style="margin:16px 0 0"><button class="btn s" onclick="go('socios')">Cancelar</button><button class="btn" onclick="saveSocio(${P||0})">${s?"Actualizar":"Guardar"}</button></div></div>`},
+"socio-d":()=>{const s=find("socios",P);const ps=S.pagos.filter(x=>x.soc===s.id),ms=S.mems.filter(x=>x.soc===s.id);
+ return head("Socios · Detalle","Socio #"+s.id+" · "+s.nombre,`<div><button class="btn s" onclick="go('socio-f',${s.id})">Editar</button> <button class="btn d" onclick="delSocio(${s.id})">Eliminar</button></div>`)+`<div class="two"><div class="card"><h2>Datos personales</h2><dl class="dl"><dt>Documento</dt><dd>${s.doc}</dd><dt>Teléfono</dt><dd>${s.tel}</dd><dt>Edad</dt><dd>${s.edad} años</dd><dt>Estado</dt><dd>${tag(s.estado)}${moroso(s.id)?" "+tag("Moroso"):""}</dd></dl></div><div class="card"><h2>Plan asignado</h2><dl class="dl"><dt>Entrenador</dt><dd>${s.ent?find("ents",s.ent).nombre:"Sin asignar"}</dd><dt>Rutina</dt><dd>${s.rut?find("ruts",s.rut).nombre:"Sin asignar"}</dd></dl><button class="btn s sm" style="margin-top:12px" onclick="go('asig')">Asignar</button></div></div><h2 style="margin:18px 0 8px">Membresías</h2>${tbl(["ID","Tipo","Inicio","Vencimiento","Estado"],ms.map(m=>({c:[m.id,m.tipo,m.ini,m.ven,tag(m.est)]})),"Sin membresías registradas.")}<h2 style="margin:18px 0 8px">Pagos</h2>${tbl(["ID","Fecha","Valor","Estado"],ps.map(p=>({c:[p.id,p.fec,money(p.val),tag(p.est)]})),"Sin pagos registrados.")}`},
+ents:()=>head("Entrenadores · RF-06","Entrenadores",`<button class="btn" onclick="go('ent-f')">Registrar entrenador</button>`)+(S.ents.length?tbl(["ID","Nombre","Especialidad","Teléfono","Socios a cargo"],S.ents.map(e=>({c:[e.id,e.nombre,e.esp,e.tel,S.socios.filter(s=>s.ent===e.id).length]})),""):`<div class="card empty">No existen entrenadores registrados</div>`),
+"ent-f":()=>head("Entrenadores · RF-05","Registrar entrenador")+`<div class="card" id="form"><div class="form">${F("eid","ID del entrenador",{t:"number",v:nextId("ents",0),h:"Debe ser único. Se usa en Asignaciones."})}${F("nombre","Nombre completo")}${F("esp","Especialidad")}${F("tel","Teléfono celular",{h:"10 dígitos numéricos (RN-03)."})}</div><div class="bar" style="margin:16px 0 0"><button class="btn s" onclick="go('ents')">Cancelar</button><button class="btn" onclick="saveEnt()">Guardar</button></div></div>`,
+ruts:()=>head("Rutinas · RF-11","Catálogo de rutinas",`<button class="btn" onclick="go('rut-f')">Crear rutina</button>`)+(S.ruts.length?tbl(["ID","Nombre","Descripción","Duración","Nivel",""],S.ruts.map(r=>({c:[r.id,r.nombre,r.desc.slice(0,38)+"…",r.dur+" semanas",r.niv,`<button class="btn s sm" onclick="go('rut-f',${r.id})">Modificar</button>`]})),""):`<div class="card empty">No existen rutinas registradas</div>`),
+"rut-f":()=>{const r=P?find("ruts",P):null;return head("Rutinas · "+(r?"RF-09":"RF-08"),r?"Modificar rutina":"Crear rutina")+`<div class="card" id="form"><div class="form">${F("rid","ID de la rutina",{t:"number",v:r?r.id:nextId("ruts",0),ro:!!r,h:r?"El ID no se puede modificar.":"Debe ser único. Se usa en Asignaciones."})}${F("nombre","Nombre",{v:r?.nombre})}${F("dur","Duración (semanas)",{t:"number",v:r?.dur})}${F("niv","Nivel",{t:"select",opts:["Básico","Intermedio","Avanzado"],v:r?.niv})}${F("desc","Descripción",{t:"area",w:1,v:r?.desc})}</div><div class="bar" style="margin:16px 0 0"><button class="btn s" onclick="go('ruts')">Cancelar</button><button class="btn" onclick="saveRut(${P||0})">${r?"Guardar cambios":"Crear"}</button></div></div>`},
+asig:()=>head("Asignaciones · RF-07 y RF-10","Asignaciones")+`<div class="two"><div class="card" id="form1"><h2>Asignar entrenador a socio</h2><div class="form" id="form" style="margin-top:10px;grid-template-columns:1fr">${F("a_s","ID del socio",{t:"number",h:"Ej.: 3",list:"dl_s"})}${F("a_e","ID del entrenador",{t:"number",h:"Ej.: 2",list:"dl_e"})}<button class="btn" onclick="asignar('ent')">Asignar entrenador</button></div></div><div class="card"><h2>Asignar rutina a socio</h2><div class="form" id="form2" style="margin-top:10px;grid-template-columns:1fr">${F("b_s","ID del socio",{t:"number",list:"dl_s"})}${F("b_r","ID de la rutina",{t:"number",list:"dl_r"})}<button class="btn" onclick="asignar('rut')">Asignar rutina</button></div></div></div><datalist id="dl_s">${S.socios.map(x=>`<option value="${x.id}">${x.nombre}</option>`).join("")}</datalist><datalist id="dl_e">${S.ents.map(x=>`<option value="${x.id}">${x.nombre}</option>`).join("")}</datalist><datalist id="dl_r">${S.ruts.map(x=>`<option value="${x.id}">${x.nombre}</option>`).join("")}</datalist><div class="card" style="margin-top:14px"><h2>Referencia de IDs</h2><div class="two" style="margin-top:10px"><div><h3>Socios</h3><ul class="hint">${S.socios.map(x=>`<li><b>${x.id}</b> · ${x.nombre}</li>`).join("")}</ul></div><div><h3>Entrenadores</h3><ul class="hint">${S.ents.map(x=>`<li><b>${x.id}</b> · ${x.nombre}</li>`).join("")}</ul></div><div><h3>Rutinas</h3><ul class="hint">${S.ruts.map(x=>`<li><b>${x.id}</b> · ${x.nombre}</li>`).join("")}</ul></div></div></div>`,
+pagos:()=>head("Pagos · RF-13","Historial de pagos",`<button class="btn" onclick="go('pago-f')">Registrar pago</button>`)+(S.pagos.length?tbl(["ID pago","ID socio","Socio","Fecha","Valor","Estado",""],S.pagos.map(p=>({id:p.soc,c:[p.id,p.soc,nombreSoc(p.soc),p.fec,money(p.val),tag(p.est),`<button class="btn s sm" onclick="event.stopPropagation();go('pago-f',${p.id})">Editar</button>`]})),"",r=>`go('socio-d',${r.id})`):`<div class="card empty">No existen pagos registrados</div>`),
+"pago-f":()=>{const p=P?find("pagos",P):null;
+ return head("Pagos · RF-12",p?"Editar pago":"Registrar pago")+`<div class="card" id="form"><div class="form">${F("pid","ID de cobro",{t:"number",v:p?p.id:nextId("pagos",100),ro:!!p,h:p?"El ID no se puede modificar.":""})}${F("soc","ID del socio",{t:"number",v:p?.soc,ro:!!p,h:p?"Socio: "+nombreSoc(p.soc):""})}${F("val","Valor (COP)",{t:"number",ph:"90000",v:p?.val})}${F("fec","Fecha de vencimiento",{t:"date",v:p?p.fec:TODAY})}${F("est","Estado",{t:"select",opts:["Pagado","Pendiente"],v:p?.est})}</div><div class="bar" style="margin:16px 0 0"><button class="btn s" onclick="go('pagos')">Cancelar</button><button class="btn" onclick="savePago(${P||0})">${p?"Actualizar":"Guardar"}</button></div></div>`},
+mems:()=>head("Membresías · RF-14","Membresías",`<button class="btn" onclick="go('mem-f')">Registrar membresía</button>`)+tbl(["ID","ID socio","Socio","Tipo","Inicio","Vencimiento","Estado"],S.mems.map(m=>({id:m.soc,c:[m.id,m.soc,nombreSoc(m.soc),m.tipo,m.ini,m.ven,tag(m.est)]})),"No existen membresías registradas",r=>`go('socio-d',${r.id})`),
+"mem-f":()=>head("Membresías · RF-14","Registrar membresía")+`<div class="card" id="form"><div class="form">${F("mid","ID de membresía",{t:"number",v:nextId("mems",200)})}${F("soc","ID del socio",{t:"number"})}${F("tipo","Tipo",{t:"select",opts:["Mensual","Trimestral","Semestral","Anual"]})}${F("ini","Fecha de inicio",{t:"date",v:TODAY})}${F("ven","Fecha de vencimiento",{t:"date",v:dd(30),h:"Debe ser posterior a la fecha de inicio (RN-05)."})}${F("est","Estado",{t:"select",opts:["Activa","Vencida","Cancelada"]})}</div><div class="bar" style="margin:16px 0 0"><button class="btn s" onclick="go('mems')">Cancelar</button><button class="btn" onclick="saveMem()">Guardar</button></div></div>`,
+activas:()=>{const a=S.mems.filter(m=>m.est==="Activa");return head("Reportes · RF-15","Membresías activas")+tbl(["ID","ID socio","Socio","Tipo","Inicio","Vencimiento","Estado"],a.map(m=>({id:m.soc,c:[m.id,m.soc,nombreSoc(m.soc),m.tipo,m.ini,m.ven,tag(m.est)]})),"No existen membresías activas",r=>`go('socio-d',${r.id})`)},
+morosos:()=>{const ids=[...new Set(S.pagos.filter(p=>p.est==="Pendiente"&&p.fec<TODAY).map(p=>p.soc))];
+ return head("Reportes · RF-16","Socios morosos")+`<p class="hint">Socio con al menos un pago pendiente cuya fecha ya venció (RN-04). Cada socio aparece una sola vez.</p>`+tbl(["ID socio","Nombre","Pagos vencidos","Estado"],ids.map(i=>({id:i,c:[i,nombreSoc(i),S.pagos.filter(p=>p.soc===i&&p.est==="Pendiente"&&p.fec<TODAY).length,tag("Moroso")]})),"No existen socios morosos",r=>`go('socio-d',${r.id})`)},
+mapa:()=>{const L=(v,t,rf)=>`<li><a href="#" onclick="go('${v}');return false">${t}</a> <span class="hint">${rf||""}</span></li>`;
+ return head("Ayuda","Mapa de navegación")+`<div class="card"><ul class="tree r"><li><b>Inicio</b> (público)<ul class="tree"><li>Login de Administrador<ul class="tree"><li><b>Dashboard</b><ul class="tree">${L("socios","Socios · consulta y búsqueda","RF-04")}<ul class="tree">${L("socio-f","Registrar / actualizar","RF-01, RF-02")}<li>Detalle del socio · eliminar con confirmación <span class="hint">RF-03</span></li></ul>${L("ents","Entrenadores","RF-05, RF-06")}${L("ruts","Rutinas","RF-08, RF-09, RF-11")}${L("asig","Asignaciones","RF-07, RF-10")}${L("pagos","Pagos","RF-12, RF-13")}${L("mems","Membresías","RF-14")}${L("activas","Reporte: membresías activas","RF-15")}${L("morosos","Reporte: socios morosos","RF-16")}</ul></li></ul></li></ul></li></ul><p class="hint" style="margin-top:12px">Transversales: confirmaciones de éxito en cada guardado (RF-17) y errores de validación con campo resaltado (RF-18).</p></div>`}
+};
+window.doLogin=()=>{const e={};if(!g("usr"))e.usr="Ingresa tu usuario.";if(!g("pwd"))e.pwd="Ingresa tu contraseña.";
+ if(!Object.keys(e).length&&!(g("usr")==="admin"&&g("pwd")==="admin123")){e.pwd="Usuario o contraseña incorrectos."}
+ if(check(e)){logged=true;toast("Sesión iniciada");go("dash")}};
+window.saveSocio=id=>{const n=g("nombre"),d=g("doc"),t=g("tel"),ed=+g("edad"),es=g("estado"),nid=+g("sid"),e={};
+ if(!id){if(!g("sid")||!Number.isInteger(nid)||nid<1)e.sid="El ID es obligatorio y debe ser un número entero positivo.";else if(S.socios.some(x=>x.id===nid))e.sid="Ese ID ya está en uso por otro socio.";}
+ if(!n)e.nombre="El nombre es obligatorio.";
+ if(!id){if(!d)e.doc="El documento es obligatorio.";else if(S.socios.some(x=>x.doc===d))e.doc="El documento ya está registrado";}
+ if(!/^\d{10}$/.test(t))e.tel="El teléfono debe tener exactamente 10 dígitos numéricos (RN-03).";
+ if(!g("edad")||ed<14||ed>80)e.edad="La edad debe estar entre 14 y 80 años (RN-01).";
+ if(!check(e))return;
+ if(id){const x=find("socios",id);Object.assign(x,{nombre:n,tel:t,edad:ed});setEstadoSocio(x,es);toast("Socio actualizado exitosamente")}
+ else{S.socios.push({id:nid,nombre:n,doc:d,tel:t,edad:ed,ent:null,rut:null,estado:es});toast("Socio registrado exitosamente · ID "+nid)}
+ go("socios")};
+window.delSocio=id=>confirmBox("¿Eliminar al socio #"+id+" y su información? Esta acción no se puede deshacer.",()=>{S.socios=S.socios.filter(s=>s.id!==id);toast("Socio eliminado exitosamente");go("socios")});
+window.saveEnt=()=>{const e={},nid=+g("eid");if(!g("eid")||!Number.isInteger(nid)||nid<1)e.eid="El ID es obligatorio y debe ser un número entero positivo.";else if(S.ents.some(x=>x.id===nid))e.eid="Ese ID ya está en uso por otro entrenador.";if(!g("nombre"))e.nombre="El nombre es obligatorio.";if(!g("esp"))e.esp="La especialidad es obligatoria.";if(!/^\d{10}$/.test(g("tel")))e.tel="El teléfono debe tener exactamente 10 dígitos numéricos (RN-03).";
+ if(!check(e))return;S.ents.push({id:nid,nombre:g("nombre"),esp:g("esp"),tel:g("tel")});toast("Entrenador registrado exitosamente · ID "+nid);go("ents")};
+window.saveRut=id=>{const e={},d=+g("dur"),nid=+g("rid");if(!id){if(!g("rid")||!Number.isInteger(nid)||nid<1)e.rid="El ID es obligatorio y debe ser un número entero positivo.";else if(S.ruts.some(x=>x.id===nid))e.rid="Ese ID ya está en uso por otra rutina.";}if(!g("nombre"))e.nombre="El nombre es obligatorio.";if(!g("dur")||d<1||d>52)e.dur="La duración debe estar entre 1 y 52 semanas.";if(!g("desc"))e.desc="La descripción es obligatoria.";
+ if(!check(e))return;const o={nombre:g("nombre"),desc:g("desc"),dur:d,niv:g("niv")};
+ if(id){Object.assign(find("ruts",id),o);toast("Rutina actualizada exitosamente")}else{S.ruts.push({id:nid,...o});toast("Rutina creada exitosamente · ID "+nid)}go("ruts")};
+window.asignar=t=>{const k=t==="ent"?["a_s","a_e"]:["b_s","b_r"],s=find("socios",g(k[0])),o=find(t==="ent"?"ents":"ruts",g(k[1])),e={};
+ if(!s)e[k[0]]="El socio no existe";if(!o)e[k[1]]=t==="ent"?"El entrenador no existe":"La rutina no existe";
+ document.querySelectorAll(".f.bad").forEach(x=>x.classList.remove("bad"));const keys=Object.keys(e);
+ if(keys.length){keys.forEach(i=>{$("#f_"+i).classList.add("bad");$("#e_"+i).textContent=e[i]});return}
+ s[t==="ent"?"ent":"rut"]=o.id;toast(t==="ent"?"Entrenador asignado exitosamente":"Rutina asignada exitosamente");go("socio-d",s.id)};
+window.savePago=eid=>{const e={},v=+g("val"),id=+g("pid");
+ if(!eid&&(!g("pid")||S.pagos.some(p=>p.id===id)))e.pid="El ID de cobro es obligatorio y no puede repetirse.";
+ if(!eid&&!find("socios",g("soc")))e.soc="El socio no existe";if(!g("val")||v<=0)e.val="El valor debe ser mayor a 0.";if(!g("fec"))e.fec="La fecha es obligatoria.";
+ if(!check(e))return;
+ if(eid){const p=find("pagos",eid);Object.assign(p,{val:v,fec:g("fec"),est:g("est")});syncSocio(p.soc);toast("Pago actualizado exitosamente")}
+ else{S.pagos.push({id,soc:+g("soc"),val:v,fec:g("fec"),est:g("est")});syncSocio(+g("soc"));toast("Pago registrado exitosamente")}
+ go("pagos")};
+window.saveMem=()=>{const e={},id=+g("mid");
+ if(!g("mid")||S.mems.some(m=>m.id===id))e.mid="El ID de membresía es obligatorio y no puede repetirse.";
+ if(!find("socios",g("soc")))e.soc="El socio no existe";if(!g("ini"))e.ini="La fecha de inicio es obligatoria.";
+ if(!g("ven"))e.ven="La fecha de vencimiento es obligatoria.";else if(g("ini")&&g("ven")<=g("ini"))e.ven="Fecha de vencimiento inválida: debe ser posterior a la de inicio (RN-05).";
+ if(!check(e))return;S.mems.push({id,soc:+g("soc"),tipo:g("tipo"),ini:g("ini"),ven:g("ven"),est:g("est")});toast("Membresía registrada exitosamente");go("mems")};
+render();
+</script></body></html>
